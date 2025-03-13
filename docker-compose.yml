@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  csharp-backend:
+    build: ./CSharpBackend
+    ports:
+      - "5001:5001" # Map TCP traffic from host port 5000 to container port 80
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ocr_recognition;User=dxy_katzchen;Password=katzchenpswd;
+    networks:
+      - flowscan-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: katzchenpswd
+      MYSQL_DATABASE: ocr_recognition
+      MYSQL_USER: dxy_katzchen
+      MYSQL_PASSWORD: katzchenpswd
+    ports:
+      - "3306:3306" # Optional: Expose if needed locally, remove in production
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql # Optional initialization
+    networks:
+      - flowscan-network
+
+networks:
+  flowscan-network:
+
+volumes:
+  db-data:
